@@ -1,0 +1,71 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[left=1in,right=1in,top=1in,bottom=1in]{geometry}
+
+\newcommand{\gimme}{\textsf{gimme}}
+
+\title{Gimme:\\ A simple versioning system for shared folders}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+We present here \gimme, a simple versioning system for shared folders. It uses an assymetric model, in which one of the parties acts as the "master" or "real truth", and the other is a dirty local copy.
+
+\subsection{Possible names}
+
+The names to be used to reference the two parties involved are not fixed yet. Possible pairs include :
+\begin{itemize}
+\item master version vs local copy
+\item truth vs dirty copy
+\item remote vs local
+\item shared vs local
+\item accepted version vs pending changes
+\end{itemize}
+
+\section{Model}
+
+We describe here the model used by \gimme{}.
+
+\subsection{Master version vs local copy}
+
+\gimme{} uses an assymetric model, where one of the two parties involved acts as a "master", and the other is seen as a local copy.
+
+The master version holds the shared truth for all the systems. It holds all the information, in the latest \textit{accepted} state. Information (conceptually speaking) should never disappear from the master version. its goal is to aggregate all the information present on all the systems.
+
+The local copy is a working directory for a single machine. Files can be modified, copied, added, removed, etc... without affecting the master version. In this case, the copy is called \textit{dirty}.
+
+Changes to the local copy are shared with all systems by calling \gimme. These changes then become part of the shared truth. We say these changes are \textit{accepted}. This is called an \textit{upload}, or \textit{update}.
+
+The other way around, changes that are part of the shared truth but are not present in the local copy are also synchronized upon calling \gimme. This process is called \textit{download} or \textit{upgrade}.
+
+\subsection{Subscription model}
+
+\subsection{Data considered}
+
+We consider folders and files.
+
+\subsection{Possible actions}
+
+For a given element (either file or folder), the possible actions can be :
+\begin{enumerate}
+\item Add
+\item Delete
+\item Update
+\end{enumerate}
+
+Note that folders can only be updated if their content has been modified (any of the changes listed above).
+
+\section{Commit}
+
+\subsection{Commit point}
+
+\subsection{Elements part of the commit / changelog}
+
+\end{document}
