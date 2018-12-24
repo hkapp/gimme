@@ -47,6 +47,18 @@ The other way around, changes that are part of the shared truth but are not pres
 
 \subsection{Subscription model}
 
+One of the big differences between the master version and local copies is that local copies do not necessarily have all the information, and maybe they do not want it.
+
+We model this using \textit{subscriptions}. Local copies explicitely subscribe to a specific set of folders and files. A local copy is not interested in updates or removal of folders or files it does not subscribe to. When a new folder or file is added in a folder that the local copy is subscribed to, the user it prompted to know whether this copy should subscribe to this new element.
+
+It is still unclear what the exact granularity of subscriptions is. It should be possible to choose which folders to subscribe to, and which not too. There could be a mechanism to tell that a folder is subscribed to all its (future) content. This can be bound to the folder, or only to the current update.
+
+The only reason to have a granularity at the level of single files would be to allow deleting a file locally because it is not necessary, but keeping it in the master version. That use-case seems very obscure. When speaking about music files, a similar result can be achieved by removing the file from the library.
+
+To subscribe, the folder only needs to be present in the local copy. New folders added in the master version can be proposed for copy in the local copy, but this process should not be the default. It is always possible to copy a folder from the master file system to subscribe to it.
+
+To unsubscribe, the folder needs to be deleted on the local copy. Then, when computing the changelog, the user should tell explicitely that this deletion is an unsubscribe, and should not be reflected in the master version. There is no default between the two behaviours, the choice must be made explicit anyway.
+
 \subsection{Data considered}
 
 We consider folders and files.
