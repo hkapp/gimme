@@ -74,6 +74,48 @@ For a given element (either file or folder), the possible actions can be :
 
 Note that folders can only be updated if their content has been modified (any of the changes listed above).
 
+\section{The synchronization process}
+
+We describe here the different steps that must be performed when synchronizing two devices.
+
+\subsection{Workflow}
+
+\subsection{Computing the changelogs}
+
+\subsection{Simple merge}
+
+\subsection{Merge conflicts}
+
+\begin{tabular}{l|c c c c}
+ & Add & Update & Delete & Unsubscribe \\
+\hline
+Add & \ref{addadd} &\\
+Update & & \ref{updupd} & \ref{upddel} &\\
+Delete & \ref{deladd} & \ref{delupd} & \\
+\end{tabular}
+
+\subsubsection{Master delete and local update}
+\label{delupd}
+
+\subsubsection{Master delete and local add}
+\label{deladd}
+
+Folder subscribed to or not before ?
+
+\subsubsection{Master add and local delete}
+\label{adddel}
+
+\subsubsection{Master update and local delete}
+\label{upddel}
+
+Unsubscribe, except if on file
+
+\subsubsection{Master add and local add}
+\label{addadd}
+
+\subsubsection{Master update and local update}
+\label{updupd}
+
 \section{Commit}
 
 \subsection{Commit point}
