@@ -103,6 +103,7 @@ We describe here the different steps that must be performed when synchronizing t
 \newcommand{\cplatest}{\action{latest}}
 \newcommand{\metaupd}{\action{upd-hash}}
 \newcommand{\rmfile}{\action{rm}}
+\newcommand{\mergefolders}{\action{merge}}
 
 \begin{table}
 	\makebox[\textwidth][c]{
@@ -117,13 +118,6 @@ local \textbackslash{} master & (\track, \same) & (\track, \modif) & (\track, \a
 \\
 (\sub, \absent)
 & $^2$[\unsub, \track] / [\subrm, \trackrm] & $^2$[\unsub, \track] / [\subrm, \trackrm] & (\subrm, \donothing, \trackrm, \donothing)
-\\
-\hline
-(\unsub, \present)
-& (\sub, \cplatest, \track, \cplatest) & (\sub, \cplatest, \track, \cplatest) & $^1$[\sub, \track] / [\subrm, \trackrm]
-\\
-(\unsub, \absent)
-& (\unsub, \donothing, \track, \donothing) & (\unsub, \donothing, \track, \metaupd) & (\subrm, \donothing, \trackrm, \donothing)
 \\
 \hline
 	\end{tabular}
@@ -144,6 +138,81 @@ local \textbackslash{} master & (\trackrm, \present) & (\trackrm, \absent) \\
 	\end{tabular}
 }
 	\caption{State machine for untracked files}
+\end{table}
+
+\begin{table}
+	\makebox[\textwidth][c]{
+	\begin{tabular}{r | c c |}
+local \textbackslash{} master & (\track, \present) & (\track, \absent) \\
+\hline
+(\sub, \present) 
+& (\sub, \donothing, \track, \donothing) & (\subrm, \rmfile, \trackrm, \donothing)
+\\
+(\sub, \absent)
+& $^2$[\unsub, \track] / [\subrm, \trackrm] & (\subrm, \donothing, \trackrm, \donothing)
+\\
+\hline
+(\unsub, \present)
+& (\sub, \mergefolders, \track, \mergefolders) & $^1$[\sub, \track] / [\subrm, \trackrm]
+\\
+(\unsub, \absent)
+& (\unsub, \donothing, \track, \donothing) & (\subrm, \donothing, \trackrm, \donothing)
+\\
+\hline
+	\end{tabular}
+}
+	\caption{State machine for tracked folders}
+\end{table}
+
+\begin{table}
+	\makebox[\textwidth][c]{
+	\begin{tabular}{r | c c |}
+local \textbackslash{} master & (\trackrm, \present) & (\trackrm, \absent) \\
+\hline
+(\subrm, \present)
+& (\sub, \mergefolders, \track, \mergefolders) & (\sub, \donothing, \track, \cpfile) \\
+(\subrm, \absent)
+& $^3$[\sub, \track] / [\unsub, \track] & (\subrm, \donothing, \trackrm, \donothing) \\
+\hline
+	\end{tabular}
+}
+	\caption{State machine for untracked folders}
+\end{table}
+
+\begin{table}
+	\makebox[\textwidth][c]{
+	\begin{tabular}{r | l}
+state & action \\
+\hline
+(\sub, \same) & \rmfile \\
+(\sub, \modif) & Conflict \\
+(\sub, \absent) & \donothing \\
+\hline
+(\subrm, \present) & Conflict \\
+(\subrm, \absent) & \donothing \\
+\hline
+	\end{tabular}
+}
+	\caption{\rmfile{} mechanism for files. In case of conflicts, keep file and print warning}
+\end{table}
+
+\begin{table}
+	\makebox[\textwidth][c]{
+	\begin{tabular}{r | l}
+state & action \\
+\hline
+(\sub, \present) & \action{recurse then rmdir} \\
+(\sub, \absent) & \donothing \\
+\hline
+(\unsub, \present) & Conflict \\
+(\unsub, \absent) & \donothing \\
+\hline
+(\subrm, \present) & Conflict \\
+(\subrm, \absent) & \donothing \\
+\hline
+	\end{tabular}
+}
+	\caption{\rmfile{} mechanism for folders. In case of conflicts, keep folder and print warning}
 \end{table}
 
 \subsection{Simple merge}
