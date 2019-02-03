@@ -82,6 +82,70 @@ We describe here the different steps that must be performed when synchronizing t
 
 \subsection{Computing the changelogs}
 
+\subsection{State machine}
+
+\newcommand{\logstate}[1]{\textsc{#1}}
+\newcommand{\sub}[0]{\logstate{sub}}
+\newcommand{\unsub}[0]{\logstate{unsub}}
+\newcommand{\subrm}[0]{\logstate{rm}}
+\newcommand{\track}[0]{\logstate{add}}
+\newcommand{\trackrm}[0]{\logstate{rm}}
+
+\newcommand{\physstate}[1]{\textsc{#1}}
+\newcommand{\same}[0]{\physstate{sam}}
+\newcommand{\modif}[0]{\physstate{upd}}
+\newcommand{\present}[0]{\physstate{add}}
+\newcommand{\absent}[0]{\physstate{rm}}
+
+\newcommand{\action}[1]{\textsf{#1}}
+\newcommand{\donothing}{\action{nothing}}
+\newcommand{\cpfile}{\action{cp}}
+\newcommand{\cplatest}{\action{latest}}
+\newcommand{\metaupd}{\action{upd-hash}}
+\newcommand{\rmfile}{\action{rm}}
+
+\begin{table}
+	\makebox[\textwidth][c]{
+	\begin{tabular}{r | c c c |}
+local \textbackslash{} master & (\track, \same) & (\track, \modif) & (\track, \absent) \\
+\hline
+(\sub, \same) 
+& (\sub, \donothing, \track, \donothing) & (\sub, \cpfile, \track, \metaupd) & (\subrm, \rmfile, \trackrm, \donothing)
+\\
+(\sub, \modif)
+& (\sub, \metaupd, \track, \cpfile) & (\sub, \cplatest, \track, \cplatest) & $^1$[\sub, \track] / [\subrm, \trackrm]
+\\
+(\sub, \absent)
+& $^2$[\unsub, \track] / [\subrm, \trackrm] & $^2$[\unsub, \track] / [\subrm, \trackrm] & (\subrm, \donothing, \trackrm, \donothing)
+\\
+\hline
+(\unsub, \present)
+& (\sub, \cplatest, \track, \cplatest) & (\sub, \cplatest, \track, \cplatest) & $^1$[\sub, \track] / [\subrm, \trackrm]
+\\
+(\unsub, \absent)
+& (\unsub, \donothing, \track, \donothing) & (\unsub, \donothing, \track, \metaupd) & (\subrm, \donothing, \trackrm, \donothing)
+\\
+\hline
+	\end{tabular}
+}
+	\caption{State machine for tracked files}
+\end{table}
+
+\begin{table}
+	\makebox[\textwidth][c]{
+	\begin{tabular}{r | c c |}
+local \textbackslash{} master & (\trackrm, \present) & (\trackrm, \absent) \\
+\hline
+(\subrm, \present)
+& (\sub, \cplatest, \track, \cplatest) & (\sub, \metaupd, \track, \cpfile) \\
+(\subrm, \absent)
+& $^3$[\sub, \track] / [\unsub, \track] & (\subrm, \donothing, \trackrm, \donothing) \\
+\hline
+	\end{tabular}
+}
+	\caption{State machine for untracked files}
+\end{table}
+
 \subsection{Simple merge}
 
 \subsection{Merge conflicts}
