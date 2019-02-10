@@ -76,14 +76,6 @@ For a given element (either file or folder), the possible actions can be :
 
 Note that folders can only be updated if their content has been modified (any of the changes listed above).
 
-\section{The synchronization process}
-
-We describe here the different steps that must be performed when synchronizing two devices.
-
-\subsection{Workflow}
-
-\subsection{Computing the changelogs}
-
 \subsection{State machine}
 
 \newcommand{\logstate}[1]{\textsc{#1}}
@@ -217,39 +209,21 @@ state & action \\
 	\caption{\rmfile{} mechanism for folders. In case of conflicts, keep folder and print warning}
 \end{table}
 
-\subsection{Simple merge}
+\section{Conflicts}
 
-\subsection{Merge conflicts}
+\textit{TODO}
 
-\begin{tabular}{l|c c c c}
- & Add & Update & Delete & Unsubscribe \\
-\hline
-Add & \ref{addadd} &\\
-Update & & \ref{updupd} & \ref{upddel} &\\
-Delete & \ref{deladd} & \ref{delupd} & \\
-\end{tabular}
+\section{Metadata}
 
-\subsubsection{Master delete and local update}
-\label{delupd}
+\newcommand{\unix}[1]{\texttt{#1}}
 
-\subsubsection{Master delete and local add}
-\label{deladd}
+Metadata is stored in every folder in a special \unix{.gimme} folder. Two possibilities from this.
 
-Folder subscribed to or not before ?
+Two subfolders \unix{folders} and \unix{files}. Every tracked file / folder gets its own file in the corresponding subfolder. This is inefficient (lots of files created), but well-suited for a Bash implementation.
 
-\subsubsection{Master add and local delete}
-\label{adddel}
+Two files \unix{folders} and \unix{files}. Every tracked file / folder gets an entry in the corresponding file. This is more efficient, but requires more text processing. Would be rather Perl-friendly.
 
-\subsubsection{Master update and local delete}
-\label{upddel}
-
-Unsubscribe, except if on file
-
-\subsubsection{Master add and local add}
-\label{addadd}
-
-\subsubsection{Master update and local update}
-\label{updupd}
+Optimization : 
 
 \section{Algorithm}
 
@@ -385,12 +359,8 @@ rm_file(file, folder) {
 }
 \end{lstlisting}
 
-Implement this in Python !
+\subsection{In Perl}
 
-\section{Commit}
-
-\subsection{Commit point}
-
-\subsection{Elements part of the commit / changelog}
+\textit{TODO}
 
 \end{document}
