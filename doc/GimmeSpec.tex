@@ -7,6 +7,8 @@
 \usepackage{amssymb}
 \usepackage[left=1in,right=1in,top=1in,bottom=1in]{geometry}
 
+\usepackage{listings}
+
 \newcommand{\gimme}{\textsf{gimme}}
 
 \title{Gimme:\\ A simple versioning system for shared folders}
@@ -248,6 +250,142 @@ Unsubscribe, except if on file
 
 \subsubsection{Master update and local update}
 \label{updupd}
+
+\section{Algorithm}
+
+\begin{lstlisting}[frame=ltbr, tabsize=4]
+gimme(localdir, masterdir) {
+	check number of arguments
+	set up constants
+	merge_folders(localdir, masterdir)
+}
+
+normalize_these(list, localmeta, mastermeta) {
+	for x in list
+	do
+		if (x notin localmeta)
+			echo RM > localmeta/x
+			
+		if (x notin mastermeta)
+			echo RM > mastermeta/x
+	od
+}
+
+normalize(localdir, masterdir) {
+	localmetafolders = localdir/.gimme/folders
+	mastermetafolders = masterdir/.gimme/folders
+	localmetafiles = localdir/.gimme/files
+	mastermetafiles = masterdir/.gimme/files
+	
+	ensure .gimme folder exists and correct shape
+
+	normalize_these(folders(localdir), localmetafolders, mastermetafolders)
+	normalize_these(folders(masterdir), localmetafolders, mastermetafolders)
+	normalize_these(tracked_folders(localdir), localmetafolders, mastermetafolders)
+	normalize_these(tracked_folders(masterdir), localmetafolders, mastermetafolders)
+	
+	normalize_these(files(localdir), localmetafiles, mastermetafiles)
+	normalize_these(files(masterdir), localmetafiles, mastermetafiles)
+	normalize_these(tracked_files(localdir), localmetafiles, mastermetafiles)
+	normalize_these(tracked_files(masterdir), localmetafiles, mastermetafiles)
+}
+
+merge_folders(localdir, masterdir) {
+	normalize(localdir, masterdir)
+	
+	for subfolder in tracked_folders(localdir)
+	do
+		merge_subfolder(subfolder, localdir, masterdir)
+	od
+	
+	for file in tracked_files(localdir)
+	do
+		merge_file(file, localdir, masterdir)
+	od
+}
+
+subfolder_state(subfolder, folder) {
+	read_meta(subfolder, folder) + (subdir in folder ?)
+}
+
+compute_state(subfolder, localdir, masterdir) {
+	localstate = subfolder_state(subfolder, localdir)
+	masterstate = subfolder_state(subfolder, localdir)
+	return localstate + masterstate
+}
+	
+merge_subfolder(subfolder, localdir, masterdir) {
+	s = compute_state(subfolder, localdir, masterdir)
+	switch (s)
+	{
+		case ...
+			ask to resolve conflict ?
+			recursively call merge or rm folder
+			write new state for this subfolder in both local and master
+	}
+}
+
+file_state(file, folder) {
+	read_meta(file, folder) + (file in folder ? updated ?)
+}
+
+compute_state(file, localdir, masterdir) {
+	localstate = file_state(file, localdir)
+	masterstate = file_state(file, localdir)
+	return localstate + masterstate
+}
+
+merge_file(file, localdir, masterdir) {
+	s = compute_state(file, localdir, masterdir)
+	switch (s)
+	{
+		case ...
+			ask to resolve conflict ?
+			some conflicts just raise warning
+			copy / update / rm file
+			write new state both in local and master
+	}
+}
+
+
+rm_folder(folder) {
+
+	for subfolder in folders(folder)
+	do
+		rm_subfolder(subfolder, folder)
+	od
+	
+	for file in files(folder)
+	do
+		rm_file(file, folder)
+	od
+	
+	rm -r .gimme folder
+}
+
+rm_subfolder(subfolder, folder) {
+	m = meta(subfolder, folder)
+	if (m = UNSUB or m = RM)
+		raise warning
+		do nothing
+	else
+		rm_folder(subfolder)
+		rmdir subfolder  // might fail due to non-empty, this is ok
+}
+
+rm_file(file, folder) {
+	v = compute SAM or UPD
+	m = meta(file, folder)
+
+	if (v = UPD or m = RM)
+		raise warning
+		do nothing
+	else
+		rm file
+}
+\end{lstlisting}
+
+Implement this in Python !
 
 \section{Commit}
 
